@@ -22,8 +22,8 @@ var github = new MyGitHubApi({
     // required
     version: "3.0.0",
     // optional
-    //debug: true,
-    //    protocol: "https",
+    // debug: true,
+        protocol: "https",
     //    host: "api.github.com", // should be api.github.com for GitHub
     //    pathPrefix: "/api/v3", // for some GHEs; none for GitHub
     //timeout: 5000,
@@ -35,8 +35,13 @@ var github = new MyGitHubApi({
 MyGitHubApi.prototype.login = function() {
     var user = localStorage.getItem('user');
     var token = localStorage.getItem('token');
-    if (user != null && token != null)
+    if (user != null && token != null) {
+        github.authenticate({
+            type:"oauth",
+            token:token,
+        });
         this.events.emit('authenticated', token);
+    }
     else {
 
         user = readlineSync.question('User :', {
@@ -59,12 +64,12 @@ MyGitHubApi.prototype.login = function() {
             note_url: "http://url-to-this-auth-app",
             client_id: clientid,
             client_secret: clientsecret,
-            fingerprint: appname,
+            fingerprint: appname + Date.now(),
             headers: {
                 "X-GitHub-OTP": twofa
             }
         }, function(err, res) {
-            //console.log(JSON.stringify(res));
+            console.log(JSON.stringify(err));
             if (res != null && res.token) {
                 localStorage.setItem('user', user);
                 localStorage.setItem('token', res.token);
